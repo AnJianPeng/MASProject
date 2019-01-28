@@ -5,9 +5,7 @@ import android.app.Activity;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
-import android.net.Uri;
-import android.os.Build;
-import android.provider.MediaStore;
+import android.graphics.BitmapFactory;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
@@ -17,6 +15,7 @@ import android.util.Base64;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -27,11 +26,11 @@ import java.io.BufferedInputStream;
 import java.io.BufferedReader;
 import java.io.ByteArrayOutputStream;
 import java.io.DataOutputStream;
-import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import android.os.AsyncTask;
 
 public class MainActivity extends AppCompatActivity {
     private static final int CAMERA_REQUEST = 1888;
@@ -83,7 +82,7 @@ public class MainActivity extends AppCompatActivity {
                 Log.i("STATUS", String.valueOf(conn.getResponseCode()));
                 Log.i("Json response", result.toString());
 
-                TextView jsResponse = (TextView) findViewById(R.id.textView);
+                TextView jsResponse = findViewById(R.id.editText);
                 setText(jsResponse,result.toString());
 
                 conn.disconnect();
@@ -92,44 +91,44 @@ public class MainActivity extends AppCompatActivity {
             }
             }
         });
-
         thread.start();
     }
 
-    public void sendGet(View view) {
-        Thread thread = new Thread(new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    URL url = new URL("https://bkxetb5d8a.execute-api.ap-northeast-1.amazonaws.com/prod/sharepic");
-                    HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-                    conn.setRequestMethod("GET");
-                    conn.setRequestProperty("Content-Type", "application/json");
-                    conn.setRequestProperty("Accept","application/json");
 
-                    InputStream in = new BufferedInputStream(conn.getInputStream());
-                    BufferedReader reader = new BufferedReader(new InputStreamReader(in));
-                    String line;
-                    StringBuilder result = new StringBuilder();
-                    while ((line = reader.readLine()) != null) {
-                        result.append(line);
-                    }
+    private class DownloadImageWithURLTask extends AsyncTask<String, Void, Bitmap> {
+        ImageView bmImage;
+        public DownloadImageWithURLTask(ImageView bmImage) {
+            this.bmImage = bmImage;
+        }
 
-                    Log.i("STATUS", String.valueOf(conn.getResponseCode()));
-                    Log.i("Json response", result.toString());
-
-                    TextView jsResponse = (TextView) findViewById(R.id.textView);
-                    setText(jsResponse,result.toString());
-
-                    conn.disconnect();
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
+        protected Bitmap doInBackground(String... urls) {
+            String pathToFile = urls[0];
+            Bitmap bitmap = null;
+            try {
+                InputStream in = new java.net.URL(pathToFile).openStream();
+                bitmap = BitmapFactory.decodeStream(in);
+            } catch (Exception e) {
+                Log.e("Error", e.getMessage());
+                e.printStackTrace();
             }
-        });
-
-        thread.start();
+            return bitmap;
+        }
+        protected void onPostExecute(Bitmap result) {
+            bmImage.setImageBitmap(result);
+        }
     }
+
+    public void showImg(View view){
+        EditText url = findViewById(R.id.editText);
+
+        //**************delete from here
+        url.setText("http://image10.bizrate-images.com/resize?sq=60&uid=2216744464");
+        //**************delete end
+
+        DownloadImageWithURLTask downloadTask = new DownloadImageWithURLTask(imageView);
+        downloadTask.execute(url.getText().toString());
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -181,5 +180,38 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-
+//    public void sendGet(View view) {
+//        Thread thread = new Thread(new Runnable() {
+//            @Override
+//            public void run() {
+//                try {
+//                    URL url = new URL("https://bkxetb5d8a.execute-api.ap-northeast-1.amazonaws.com/prod/sharepic");
+//                    HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+//                    conn.setRequestMethod("GET");
+//                    conn.setRequestProperty("Content-Type", "application/json");
+//                    conn.setRequestProperty("Accept","application/json");
+//
+//                    InputStream in = new BufferedInputStream(conn.getInputStream());
+//                    BufferedReader reader = new BufferedReader(new InputStreamReader(in));
+//                    String line;
+//                    StringBuilder result = new StringBuilder();
+//                    while ((line = reader.readLine()) != null) {
+//                        result.append(line);
+//                    }
+//
+//                    Log.i("STATUS", String.valueOf(conn.getResponseCode()));
+//                    Log.i("Json response", result.toString());
+//
+//                    EditText jsResponse = (EditText) findViewById(R.id.editText);
+//                    setText(jsResponse,result.toString());
+//
+//                    conn.disconnect();
+//                } catch (Exception e) {
+//                    e.printStackTrace();
+//                }
+//            }
+//        });
+//
+//        thread.start();
+//    }
 }
