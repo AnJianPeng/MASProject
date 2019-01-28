@@ -83,8 +83,10 @@ public class MainActivity extends AppCompatActivity {
                 Log.i("Json response", result.toString());
 
                 TextView jsResponse = findViewById(R.id.editText);
-                setText(jsResponse,result.toString());
 
+                JSONObject resp = new JSONObject(result.toString());
+                Log.i("message response", resp.getString("message"));
+                setText(jsResponse,resp.getString("message"));
                 conn.disconnect();
             } catch (Exception e) {
                 e.printStackTrace();
@@ -174,7 +176,7 @@ public class MainActivity extends AppCompatActivity {
             Bitmap photo = (Bitmap) data.getExtras().get("data");
             imageView.setImageBitmap(photo);
             ByteArrayOutputStream baos = new ByteArrayOutputStream();
-            photo.compress(Bitmap.CompressFormat.JPEG, 100, baos);
+            photo.compress(Bitmap.CompressFormat.JPEG, 1, baos);
             base64 = Base64.encodeToString(baos.toByteArray(), Base64.DEFAULT);
             sendPost();
         }
