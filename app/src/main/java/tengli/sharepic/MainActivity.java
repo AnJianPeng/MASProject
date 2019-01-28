@@ -13,6 +13,7 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Base64;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
@@ -24,6 +25,7 @@ import org.json.JSONObject;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedReader;
+import java.io.ByteArrayOutputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -35,7 +37,7 @@ public class MainActivity extends AppCompatActivity {
     private static final int CAMERA_REQUEST = 1888;
     private ImageView imageView;
     private static final int MY_CAMERA_PERMISSION_CODE = 100;
-
+    private String base64 = "nothing";
     private void setText(final TextView text,final String value){
         runOnUiThread(new Runnable() {
             @Override
@@ -45,7 +47,7 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
-    public void sendPost(View view) {
+    public void sendPost() {
         Thread thread = new Thread(new Runnable() {
             @Override
             public void run() {
@@ -61,7 +63,7 @@ public class MainActivity extends AppCompatActivity {
                 JSONObject jsonParam = new JSONObject();
                 jsonParam.put("key1", "value1");
                 jsonParam.put("key2", "value2");
-                jsonParam.put("key3", "value3");
+                jsonParam.put("key3", base64);
 
                 Log.i("Send JSON", jsonParam.toString());
                 DataOutputStream os = new DataOutputStream(conn.getOutputStream());
@@ -172,6 +174,10 @@ public class MainActivity extends AppCompatActivity {
         if (requestCode == CAMERA_REQUEST && resultCode == Activity.RESULT_OK) {
             Bitmap photo = (Bitmap) data.getExtras().get("data");
             imageView.setImageBitmap(photo);
+            ByteArrayOutputStream baos = new ByteArrayOutputStream();
+            photo.compress(Bitmap.CompressFormat.JPEG, 100, baos);
+            base64 = Base64.encodeToString(baos.toByteArray(), Base64.DEFAULT);
+            sendPost();
         }
     }
 
