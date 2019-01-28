@@ -30,6 +30,8 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.net.URLConnection;
+
 import android.os.AsyncTask;
 
 public class MainActivity extends AppCompatActivity {
@@ -105,7 +107,10 @@ public class MainActivity extends AppCompatActivity {
             String pathToFile = urls[0];
             Bitmap bitmap = null;
             try {
-                InputStream in = new java.net.URL(pathToFile).openStream();
+                URL url = new java.net.URL(pathToFile);
+                URLConnection conn = url.openConnection();
+                conn.setRequestProperty("Accept", "image/jpeg");
+                InputStream in = conn.getInputStream();
                 bitmap = BitmapFactory.decodeStream(in);
             } catch (Exception e) {
                 Log.e("Error", e.getMessage());
@@ -122,7 +127,7 @@ public class MainActivity extends AppCompatActivity {
         EditText url = findViewById(R.id.editText);
 
         //**************delete from here
-        url.setText("http://image10.bizrate-images.com/resize?sq=60&uid=2216744464");
+        //url.setText("http://image10.bizrate-images.com/resize?sq=60&uid=2216744464");
         //**************delete end
 
         DownloadImageWithURLTask downloadTask = new DownloadImageWithURLTask(imageView);
