@@ -51,7 +51,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void run() {
             try {
-                URL url = new URL("https://bkxetb5d8a.execute-api.ap-northeast-1.amazonaws.com/prod/sharepic");
+                URL url = new URL("https://b9aknc0duk.execute-api.ap-northeast-1.amazonaws.com/beta/image");
                 HttpURLConnection conn = (HttpURLConnection) url.openConnection();
                 conn.setRequestMethod("POST");
                 conn.setRequestProperty("Content-Type", "application/json;charset=UTF-8");
@@ -60,9 +60,7 @@ public class MainActivity extends AppCompatActivity {
                 conn.setDoInput(true);
 
                 JSONObject jsonParam = new JSONObject();
-                jsonParam.put("key1", "value1");
-                jsonParam.put("key2", "value2");
-                jsonParam.put("key3", base64);
+                jsonParam.put("image", base64);
 
                 Log.i("Send JSON", jsonParam.toString());
                 DataOutputStream os = new DataOutputStream(conn.getOutputStream());
@@ -85,8 +83,8 @@ public class MainActivity extends AppCompatActivity {
                 TextView jsResponse = findViewById(R.id.editText);
 
                 JSONObject resp = new JSONObject(result.toString());
-                Log.i("message response", resp.getString("message"));
-                setText(jsResponse,resp.getString("message"));
+                Log.i("message response", resp.getString("Location"));
+                setText(jsResponse,resp.getString("Location"));
                 conn.disconnect();
             } catch (Exception e) {
                 e.printStackTrace();
