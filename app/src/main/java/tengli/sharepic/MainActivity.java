@@ -178,7 +178,7 @@ public class MainActivity extends AppCompatActivity {
         if (requestCode == CAMERA_REQUEST && resultCode == Activity.RESULT_OK) {
             Bitmap photo = (Bitmap) data.getExtras().get("data");
             ByteArrayOutputStream baos = new ByteArrayOutputStream();
-            photo.compress(Bitmap.CompressFormat.JPEG, 50, baos);
+            photo.compress(Bitmap.CompressFormat.JPEG, 80, baos);
             imageView.setImageBitmap(photo);
             base64 = Base64.encodeToString(baos.toByteArray(), Base64.DEFAULT);
             sendPost();
